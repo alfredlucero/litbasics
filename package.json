@@ -1,0 +1,12 @@
+{
+  "name": "@wcd/alfredlucero.litts-l9rvhcoo",
+  "version": "0.0.0",
+  "description": "",
+  "license": "ISC",
+  "type": "module",
+  "homepage": "{{ homepage }}",
+  "scripts": {
+    "serve": "npx wcd-cli@latest serve nZc4Tfi0R8aHGR4wai7y --open"
+  },
+  "dependencies": {}
+}
