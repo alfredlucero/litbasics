@@ -7,9 +7,40 @@
 </head>
 
 <body>
+  <template>
+    <style>
+      h1 {
+        color: blue;
+      }
+    </style>
+    <h1>Web component basics</h1>
+  </template>
+  <cool-heading>
+  </cool-heading>
   <!-- <h1>Hello Counter!</h1> -->
   <!-- <my-counter></my-counter> -->
   <todo-app></todo-app>
 </body>
+
+<script>
+  class CoolHeading extends HTMLElement {
+    constructor() {
+      super();
+
+      this.addEventListener('click', () => {
+        this.style.color = 'red';
+      });
+    }
+
+    connectedCallback() {
+      console.log("Cool heading connected!");
+      const template = document.querySelector('template');
+      const clone = document.importNode(template.content, true);
+      this.attachShadow({ mode: 'open' });
+      this.shadowRoot.appendChild(clone);
+    }
+  }
+  customElements.define('cool-heading', CoolHeading);
+</script>
 
 </html>
