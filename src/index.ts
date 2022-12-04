@@ -1,6 +1,7 @@
-import {html, css, LitElement} from 'lit';
+import {html, css, LitElement, PropertyValues} from 'lit';
 import {customElement, property, state} from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
+import { classMap } from 'lit/directives/class-map.js';
 
 @customElement('my-counter')
 export class SimpleGreeting extends LitElement {
@@ -570,5 +571,135 @@ export class CssTest extends LitElement {
         <h1 id="purple">This text is purple</h1>
       </div>
     `;
+  }
+}
+
+@customElement('story-card')
+export class StoryCard extends LitElement {
+  static styles = css`
+    #media {
+      height: 100%;
+    }
+
+    #media ::slotted(*) {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    #content {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      padding: 48px;
+      font-family: sans-serif;
+      color; white;
+      font-size: 24px;
+    }
+    #content > slot::slotted(*) {
+      margin: 0;
+    }
+  `;
+      
+  render() {
+    return html`
+      <div id="media">
+        <slot name="media"></slot>
+      </div>
+      <div id="content">
+        <slot></slot>
+      </div>
+    `;
+  }
+}
+
+@customElement('story-viewer')
+export class StoryViewer extends LitElement {
+  @property({ type: Number }) index: number = 0;
+
+  static styles = css`
+    :host {
+      display: block;
+      position: relative;
+      width: 300px;
+      height: 800px;
+    }
+
+    ::slotted(*) {
+      position: absolute;
+      width: 100%;
+      height: calc(100% - 20px);
+    }
+
+    svg {
+      position: absolute;
+      top: calc(50% - 25px);
+      height: 50px;
+      cursor: pointer;
+    }
+
+    #next {
+      right: 0;
+    }
+
+    #progress {
+      position: relative;
+      top: calc(100% - 20px);
+      height: 20px;
+      width: 50%;
+      margin: 0 auto;
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: 1fr;
+      grid-gap: 10px;
+      align-content: center;
+    }
+    #progress > div {
+      background: grey;
+      height: 4px;
+      transition: background 0.3s linear;
+      cursor: pointer;
+    }
+    #progress > div.watched {
+      background: white;
+    }
+  `;
+
+  render() {
+    return html`
+      <slot></slot>
+
+      <svg id="prev" viewBox="0 0 10 10" @click=${() => this.previous()}>
+        <path d="M 6 2 L 4 5 L 6 8" stroke="#fff" fill="none" />
+      </svg>
+      <svg id="next" viewBox="0 0 10 10" @click=${() => this.next()}>
+        <path d="M 4 2 L 6 5 L 4 8" stroke="#fff" fill="none" />
+      </svg>
+
+      <div id="progress">
+        ${Array.from(this.children).map((_, i) => html`
+          <div class=${classMap({ watched: i <= this.index})} @click=${() => this.index = i}></div>
+        `)}
+      </div>
+    `;
+  }
+
+  update(changedProperties: PropertyValues) {
+    const width = this.clientWidth;
+    Array.from(this.children).forEach((el: Element, i) => {
+      const x = (i - this.index) * width;
+      (el as HTMLElement).style.transform = `translate3d(${x}px,0,0)`;
+    });
+    super.update(changedProperties);
+  }
+
+  next() {
+    this.index = Math.max(0, Math.min(this.children.length - 1, this.index + 1));
+  }
+
+  previous() {
+    this.index = Math.max(0, Math.min(this.children.length - 1, this.index - 1));
   }
 }
